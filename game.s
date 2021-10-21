@@ -1,7 +1,8 @@
 #.include "./MACROSv21.s"
 
 .data
-#.include "./sprites.s"
+.include "./sprites.s"
+.include "./screens.s"
 .include "./musics.s" 
 
 ### JOGO ###
@@ -29,8 +30,7 @@ MAIN_MENU:
 	jal PLAY_NOTE_TRACK3
 
     # imprime a imagem de fundo
-    csrr s11,3073   # ultimo tempo em que o frame foi impresso (inicio = tempo atual)
-    #jal IMPRIME_BACKGROUND_MAIN_MENU    # imprime o main_menu_background
+    jal IMPRIME_BACKGROUND_MAIN_MENU    # imprime o main_menu_background
 
 LOOP_MAIN_MENU:
     # verifica e toca a nota de cada track da musica 
@@ -150,27 +150,25 @@ PLAY_NOTE_TRACK3:    # toca a nota e avanca
 	
 	ret
 
-IMPRIME_BACKGROUND_MAIN_MENU: # imprime o fundo no menu inicial
-    mv a0,s9
-	li a1,0			# leitura
-	li a2,0			# binario
-	li a7,1024		# syscall de open file
-	ecall			# retorna em a0 o descritor do arquivo
+# imprime a tela de menu inicial
+IMPRIME_BACKGROUND_MAIN_MENU:
+    li t0,0xFF200604	# seleciona o frame 0
+	sw zero,0(t0)
 
-    mv t0,a0		# salva o descritor em a0
+	li t1,0xFF000000	# endereco inicial da memoria VGA - Frame 0
+	li t2,0xFF012C00	# endereco final da memoria VGA - Frame 0
+	la t0,main_menu	# endereco da imagem
+	addi t1,t1,8		# primeiro pixel depois das informacoes de nlin ncol
 
-    # Le o arquivos para a memoria VGA
-	mv a0,t0		# $a0 recebe o descritor
-	li a1,0xFF000000	# endereco de destino dos bytes lidos
-	li a2,76800		# quantidade de bytes
-	li a7,63		# syscall de read file
-	ecall			# retorna em $v0 o numero de bytes lidos
-	
-	# Fecha o arquivo
-	mv a0,t0		# $a0 recebe o descritor
-	li a7,57		# syscall de close file
-	ecall			# retorna se foi tudo ok
+LOOP_IMPRIME_BACKGROUND_MAIN_MENU: 	
+	beq t1,t2,CONT_IMPRIME_BACKGROUND_MAIN_MENU		# se for o ultimo endereco entao sai do loop
+	lw t3,0(t0)		# le um conjunto de 4 pixels (word)
+	sw t3,0(t1)		# escreve a word na memoria VGA
+	addi t1,t1,4	# soma 4 ao endereco da memoria
+	addi t0,t0,4	# soma 4 ao endereco da imagem
+	j LOOP_IMPRIME_BACKGROUND_MAIN_MENU
 
+CONT_IMPRIME_BACKGROUND_MAIN_MENU:
     ret
 
 ### INICIA O JOGO ###
