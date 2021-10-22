@@ -206,12 +206,12 @@ GAMELOOP_FASE1:
 	sub a0,t5,t2	# y = 240 - y
 	
 	li t5,320
-	mul a1,a0,t5	# y*320
+	mul a1,a0,t5	# y * 320
 	add a1,a1,t1	# a1 += x
 
 	add t3,t3,a1	# parte da esquerda do sprite
 
-	addi a1,a1,-16	
+	addi a1,a1,-16
 	add a2,a2,a1	# parte da direita do sprite
 
 	lw t4,0(t3)
@@ -238,7 +238,7 @@ TMP:
    	beqz t0,CONT_GAMELOOP_FASE1		# nao tem tecla pressionada
    	lw t2,4(t1)		            # le o valor da tecla
 
-	# QUAL TECLA
+	# qual tecla
   	lw t2,4(t1)  			# le o valor da tecla tecla
 	sw t2,12(t1)  			# escreve a tecla pressionada no display
 	
