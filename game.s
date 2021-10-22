@@ -196,16 +196,49 @@ GAMELOOP_FASE1:
 	# verifica se ele está pulando (s1)
 	beqz s1 GRAVIDADE
 
-	# incrementa o y (precisa verificar)
+	# decrementa o estado do pulo
+	addi s1,s1,-1
+
+	# esta pulando, verifica se e possivel subir
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t2,t2,16	# olha o pixel acima dele
+
+	la t3,mapa1_hitbox
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+
+	add t3,t3,a1	# parte da esquerda do sprite
+
+	addi a1,a1,-16
+	add a2,a2,a1	# parte da direita do sprite
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,NAO_SOBE	# eh azul = nao sobe
+	beq t6,t5,NAO_SOBE	# eh azul = nao sobe
+
+	# incrementa o y
 	la t0,COORD_P1
 	lw t2,4(t0)		# t2 = y
 	addi t2,t2,1	# y++
 	sw t2,4(t0)		# y = t2
 
-	# decrementa o estado do pulo
-	addi s1,s1,-1
-
 	j CONT_GRAVIDADE
+
+NAO_SOBE:
+	li s1,0		# reseta estado do pulo
 
 GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	# coordenadas atuais do jogador
