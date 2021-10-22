@@ -181,6 +181,7 @@ GAME:
 	# carrega valores para a primeira fase
 	li s0,0		# alternar entre mapa / hitbox
 	li s1,0		# "estado" do pulo (> 0 ele vai subindo até ser 0)
+	li s2,0		# quantidade de pulos (max: 2)
 
 	# coordenadas inicias do player 1
 	li t1,100	# x do player 1
@@ -275,10 +276,16 @@ GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	#ecall
 
 	li t5,-1061109568	# azul
-	beq t4,t5,CONT_GRAVIDADE	# eh azul = nao desce
-	beq t6,t5,CONT_GRAVIDADE	# eh azul = nao desce
+	beq t4,t5,RESETA_PULO	# eh azul = nao desce
+	beq t6,t5,RESETA_PULO	# eh azul = nao desce
 
 	sw t2,4(t0)		# y--
+
+	j CONT_GRAVIDADE
+
+RESETA_PULO:
+	li s2,2		# reinicia os pulos (2 pulos)
+
 CONT_GRAVIDADE:
 	# verifica se uma tecla foi pressionada
     li t1,0xFF200000	        # carrega o endereco de controle do KDMMIO
@@ -384,8 +391,10 @@ CONT_DIREITA_FASE1:
 	ret
 
 PULO_FASE1:
-	li s1,ALTURA_PULO	# altura do pulo
-
+	beqz s2,CONT_PULO_FASE1	# verifica se pode pular
+	li s1,ALTURA_PULO		# altura do pulo
+	addi s2,s2,-1			# diminui um pulo
+CONT_PULO_FASE1:
 	ret
 
 CONT_GAMELOOP_FASE1:
