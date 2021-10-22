@@ -208,7 +208,6 @@ GAMELOOP_FASE1:
 	j CONT_GRAVIDADE
 
 GRAVIDADE:	# verifica se ele pode cair (gravidade)
-	
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
 	lw t1,0(t0)		# t1 = x
@@ -280,24 +279,75 @@ TROCA_MAPA:
 
 ESQUERDA_FASE1:
 	# verifica se é possível
-	
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
-	lw t3,0(t0)		# t3 = x
-	addi t3,t3,-4	# incrementa
-	sw t3,0(t0)		# t3 = x
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t1,t1,-4	# olha o pixel esquerda
 
+	la t3,mapa1_hitbox
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+	addi a1,a1,-16
+
+	add t3,t3,a1	# parte de baixo_esquerda
+
+	addi a1,a1,-5120	# y - 320 * 16
+	add a2,a2,a1	# parte de cima_esquerda
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,CONT_ESQUERDA_FASE1	# eh azul = nao desce
+	beq t6,t5,CONT_ESQUERDA_FASE1	# eh azul = nao desce
+
+	sw t1,0(t0)		# t1 = x
+
+CONT_ESQUERDA_FASE1:
 	ret
 
 DIREITA_FASE1:
 	# verifica se é possível
-
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
-	lw t3,0(t0)		# t3 = x
-	addi t3,t3,4	# incrementa
-	sw t3,0(t0)		# t3 = x
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t1,t1,4	# olha o pixel direita
 
+	la t3,mapa1_hitbox
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+
+	add t3,t3,a1	# parte de baixo_direita
+
+	addi a1,a1,-5120	# y - 320 * 16
+	add a2,a2,a1	# parte de cima_direita
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,CONT_DIREITA_FASE1	# eh azul = nao desce
+	beq t6,t5,CONT_DIREITA_FASE1	# eh azul = nao desce
+
+	sw t1,0(t0)		# t1 = x
+
+CONT_DIREITA_FASE1:
 	ret
 
 PULO_FASE1:
