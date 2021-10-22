@@ -391,6 +391,7 @@ PULO_FASE1:
 CONT_GAMELOOP_FASE1:
 	jal IMPRIME_FASE1
 	
+	# imprime o player 1
 	li t4,0xFF000000 # endereco inicial da memoria de video
 	la a5,madeline_stop 	# carrega o sprite
 	
