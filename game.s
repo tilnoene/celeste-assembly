@@ -1,4 +1,5 @@
 #.include "./MACROSv21.s"
+.eqv ALTURA_PULO 20
 
 .data
 .include "./sprites.s"
@@ -6,6 +7,7 @@
 .include "./musics.s"
 
 COORD_P1:	.word	0,0	# (x, y) do jogador
+COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 ### JOGO ###
 .text
@@ -178,11 +180,12 @@ CONT_IMPRIME_BACKGROUND_MAIN_MENU:
 GAME:
 	# carrega valores para a primeira fase
 	li s0,0		# alternar entre mapa / hitbox
+	li s1,0		# "estado" do pulo (> 0 ele vai subindo até ser 0)
 
 	# coordenadas inicias do player 1
 	li t1,100	# x do player 1
 	li t2,180	# y do player 1
-	la t0,COORD_P1
+	la t0,COORD_P1	# armazena as coordenadas
 	sw t1,0(t0)	# t1 = x
 	sw t2,4(t0)	# t2 = y
 
@@ -190,7 +193,21 @@ GAME:
 
 ### FASE 1 ###
 GAMELOOP_FASE1:
-	# verifica se ele pode cair (gravidade)
+	# verifica se ele está pulando (s1)
+	beqz s1 GRAVIDADE
+
+	# incrementa o y (precisa verificar)
+	la t0,COORD_P1
+	lw t2,4(t0)		# t2 = y
+	addi t2,t2,1	# y++
+	sw t2,4(t0)		# y = t2
+
+	# decrementa o estado do pulo
+	addi s1,s1,-1
+
+	j CONT_GRAVIDADE
+
+GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -226,11 +243,11 @@ GAMELOOP_FASE1:
 	#ecall
 
 	li t5,-1061109568	# azul
-	beq t4,t5,TMP	# eh azul = nao desce
-	beq t6,t5,TMP	# eh azul = nao desce
+	beq t4,t5,CONT_GRAVIDADE	# eh azul = nao desce
+	beq t6,t5,CONT_GRAVIDADE	# eh azul = nao desce
 
 	sw t2,4(t0)		# y--
-TMP:
+CONT_GRAVIDADE:
 	# verifica se uma tecla foi pressionada
     li t1,0xFF200000	        # carrega o endereco de controle do KDMMIO
 	lw t0,0(t1)		            # le bit de Controle Teclado
@@ -250,6 +267,9 @@ TMP:
 	
 	li t0,100	# d
 	beq t2,t0,DIREITA_FASE1
+
+	li t0,119	# w
+	beq t2,t0,PULO_FASE1
 	
 	# nenhuma dessas letras
 	j CONT_GAMELOOP_FASE1
@@ -277,6 +297,11 @@ DIREITA_FASE1:
 	lw t3,0(t0)		# t3 = x
 	addi t3,t3,4	# incrementa
 	sw t3,0(t0)		# t3 = x
+
+	ret
+
+PULO_FASE1:
+	li s1,ALTURA_PULO	# altura do pulo
 
 	ret
 
