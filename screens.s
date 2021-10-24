@@ -4,3 +4,5 @@
 ### MAPAS ###
 .include "screens/mapa1_background.data"
 .include "screens/mapa1_hitbox.data"
+
+.include "screens/mapa0_hitbox.data"

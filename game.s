@@ -184,8 +184,8 @@ GAME:
 	li s2,0		# quantidade de pulos (max: 2)
 
 	# coordenadas inicias do player 1
-	li t1,100	# x do player 1
-	li t2,180	# y do player 1
+	li t1,90	# x do player 1
+	li t2,50	# y do player 1
 	la t0,COORD_P1	# armazena as coordenadas
 	sw t1,0(t0)	# t1 = x
 	sw t2,4(t0)	# t2 = y
@@ -207,7 +207,7 @@ GAMELOOP_FASE1:
 	lw t2,4(t0)		# t2 = y
 	addi t2,t2,16	# olha o pixel acima dele
 
-	la t3,mapa1_hitbox
+	la t3,mapa0_hitbox
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -248,7 +248,7 @@ GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	lw t2,4(t0)		# t2 = y
 	addi t2,t2,-1	# olha o pixel abaixo dele
 
-	la t3,mapa1_hitbox
+	la t3,mapa0_hitbox
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -325,7 +325,7 @@ ESQUERDA_FASE1:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,-4	# olha o pixel esquerda
 
-	la t3,mapa1_hitbox
+	la t3,mapa0_hitbox
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -362,7 +362,7 @@ DIREITA_FASE1:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,4	# olha o pixel direita
 
-	la t3,mapa1_hitbox
+	la t3,mapa0_hitbox
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -484,7 +484,7 @@ IMPRIME_FASE1:
 	j CONT_IMPRIME_FASE1_HITBOX
 
 IMPRIME_FASE1_HITBOX:
-	la t0,mapa1_hitbox	# endereco da imagem
+	la t0,mapa0_hitbox	# endereco da imagem
 
 CONT_IMPRIME_FASE1_HITBOX:
 	addi t1,t1,8		# primeiro pixel depois das informacoes de nlin ncol
