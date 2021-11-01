@@ -1,5 +1,6 @@
 #.include "./MACROSv21.s"
 .eqv ALTURA_PULO 20
+.eqv FASE_INIMIGO 1	# numero da fase em que o inimigo aparece
 
 .data
 .include "./sprites.s"
@@ -550,7 +551,13 @@ CONT_LOOP_I:
 	j LOOP_J
 
 EXIT_LOOP:
+	# move e imprime o player 2?
+	li t0,FASE_INIMIGO
+	bne s4,t0,EXIT_LOOP1
 
+	
+
+EXIT_LOOP1:
 	# SLEEP
 	li a7,32
 	li a0,10
