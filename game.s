@@ -698,11 +698,71 @@ IMPRIME_FASE:
 	li t1,0xFF000000	# endereco inicial da memoria VGA - Frame 0
 	li t2,0xFF012C00	# endereco final da memoria VGA - Frame 0
 	beqz s0,IMPRIME_FASE_HITBOX
+	
+	li t0,0
+	beq s4,t0,MAPA_1_BACKGROUND
+	li t0,1
+	beq s4,t0,MAPA_2_BACKGROUND
+	li t0,2
+	beq s4,t0,MAPA_3_BACKGROUND
+	li t0,3
+	beq s4,t0,MAPA_4_BACKGROUND
+	li t0,4
+	beq s4,t0,MAPA_5_BACKGROUND
+
+	#j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_1_BACKGROUND:
+	la t0,mapa1_background	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_2_BACKGROUND:
+	la t0,mapa1_background	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_3_BACKGROUND:
+	la t0,mapa1_background	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_4_BACKGROUND:
+	la t0,mapa1_background	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_5_BACKGROUND:
 	la t0,mapa1_background	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 IMPRIME_FASE_HITBOX:
+	li t0,0
+	beq s4,t0,MAPA_1_HITBOX
+	li t0,1
+	beq s4,t0,MAPA_2_HITBOX
+	li t0,2
+	beq s4,t0,MAPA_3_HITBOX
+	li t0,3
+	beq s4,t0,MAPA_4_HITBOX
+	li t0,4
+	beq s4,t0,MAPA_5_HITBOX
+
+MAPA_1_HITBOX:
 	la t0,mapa1_hitbox	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_2_HITBOX:
+	la t0,mapa1_hitbox	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_3_HITBOX:
+	la t0,mapa1_hitbox	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_4_HITBOX:
+	la t0,mapa1_hitbox	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
+
+MAPA_5_HITBOX:
+	la t0,mapa1_hitbox	# endereco da imagem
+	j CONT_IMPRIME_FASE_HITBOX
 
 CONT_IMPRIME_FASE_HITBOX:
 	addi t1,t1,8		# primeiro pixel depois das informacoes de nlin ncol
