@@ -204,6 +204,14 @@ RESET_VALUES:
 	sw t1,0(t0)	# t1 = x
 	sw t2,4(t0)	# t2 = y
 
+	# coordenadas iniciais do player 2
+	li t1,96	# x do player 2
+	li t2,180	# y do player 2
+
+	la t0,COORD_P2	# armazena as coordenadas
+	sw t1,0(t0)	# t1 = x
+	sw t2,4(t0)	# t2 = y
+
     jal IMPRIME_FASE		# imprime o mapa1
 
 ### FASE X ###
@@ -551,11 +559,74 @@ CONT_LOOP_I:
 	j LOOP_J
 
 EXIT_LOOP:
-	# move e imprime o player 2?
+	# verifica se eh a fase pra imprimir o inimigo
 	li t0,FASE_INIMIGO
 	bne s4,t0,EXIT_LOOP1
 
+	# move o player 2
+
+	# imprime o player 2
+	li t4,0xFF000000 # endereco inicial da memoria de video
+	la a5,inimigo_stop 	# carrega o sprite
 	
+	lw a1,4(a5)	# a1 = h (altura do sprite)
+	lw a2,0(a5)	# a2 = w (largura do sprite)
+	
+	# coordenadas atuais do inimigo
+	la t0,COORD_P2
+	lw a3,0(t0)	# a3 = x
+	lw a4,4(t0)	# a4 = y
+	
+	addi a5,a5,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	
+	li t0,240
+	sub t1,t0,a4	# inverte a orientacao em relacao ao eixo X
+	sub t0,t1,a1
+	
+	mv a4,t0	# t5 (ini) = x + 320 * (y - 1)
+	mv t5,a3	# t5 = x
+	li t1,320	
+	mul t6,t1,a4	# t6 = 320 * y
+	add t5,t5,t6	# t5 += t6
+	
+	add t4,t4,t5	# t4 += inicio
+	
+	li t3,320		# sum = 320 - w (quantidade para pular para a proxima linha)
+	sub t3,t3,a2	# -w
+	
+	sub t4,t4,t3	# memoria -= inicio (afinal pula a cada LOOP_I1, inclusive o primeiro)
+	
+	li t1,0 # i
+	li t2,0 # j
+	
+	# escolhe o frame
+	beqz s11,LOOP_I1		# frame 0
+	li t0,0x00100000
+	add t4,t4,t0		# frame 1
+	
+LOOP_I1:
+	beq t1,a1,EXIT_LOOP1
+	addi t1,t1,1 	# i++
+	li t2,0		# j = 0
+	
+	add t4,t4,t3
+	
+LOOP_J1:
+	beq t2,a2,LOOP_I1
+	addi t2,t2,1	# j++
+	
+	lb t0,0(a5)
+	
+	li a0,0xFFFFFFC7		# cor magenta
+	beq t0,a0,CONT_LOOP_I11	# se o pixel for magenta nao imprime nada
+
+PRINT_IMG1:	sb t0,0(t4)
+	
+CONT_LOOP_I11:
+	addi a5,a5,1	# sprite++
+	addi t4,t4,1	# memoria++
+	
+	j LOOP_J1
 
 EXIT_LOOP1:
 	# SLEEP
