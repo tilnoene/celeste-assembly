@@ -10,7 +10,7 @@ COORD_P1:	.word	0,0	# (x, y) do jogador
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 # coordenada inicial em de cada mapa (X, Y)
-COORD_INICIAL_MAPAS:	.word	0,0, 0,0, 0,0
+COORD_INICIAL_MAPAS:	.word	32,70, 0,0, 0,0
 
 ### JOGO ###
 .text
@@ -191,8 +191,14 @@ RESET_VALUES:
 	li s2,0		# quantidade de pulos (max: 2)
 
 	# coordenadas inicias do player 1
-	li t1,100	# x do player 1
-	li t2,180	# y do player 1
+	la t0,COORD_INICIAL_MAPAS
+	li t1,8
+	mul t1,t1,s4	# mapa_atual * 2 (2 coord.) * 4 (1 word)
+	add t0,t0,t1
+
+	lw t1,0(t0)	# x do player 1
+	lw t2,4(t0)	# y do player 1
+
 	la t0,COORD_P1	# armazena as coordenadas
 	sw t1,0(t0)	# t1 = x
 	sw t2,4(t0)	# t2 = y
