@@ -183,6 +183,10 @@ CONT_IMPRIME_BACKGROUND_MAIN_MENU:
 GAME:
 	# carrega valores para a primeira fase
 	li s0,0		# alternar entre mapa / hitbox
+	li s4,0		# fase atual [0, 4]
+
+# reinicia os valores a cada fase
+RESET_VALUES:
 	li s1,0		# "estado" do pulo (> 0 ele vai subindo até ser 0)
 	li s2,0		# quantidade de pulos (max: 2)
 
@@ -193,10 +197,10 @@ GAME:
 	sw t1,0(t0)	# t1 = x
 	sw t2,4(t0)	# t2 = y
 
-    jal IMPRIME_FASE1		# imprime o mapa1
+    jal IMPRIME_FASE		# imprime o mapa1
 
-### FASE 1 ###
-GAMELOOP_FASE1:
+### FASE X ###
+GAMELOOP_FASE:
 	# verifica se ele está pulando (s1)
 	beqz s1 GRAVIDADE
 
@@ -294,7 +298,7 @@ CONT_GRAVIDADE:
     li t1,0xFF200000	        # carrega o endereco de controle do KDMMIO
 	lw t0,0(t1)		            # le bit de Controle Teclado
    	andi t0,t0,0x0001	        # mascara o bit menos significativo
-   	beqz t0,CONT_GAMELOOP_FASE1		# nao tem tecla pressionada
+   	beqz t0,CONT_GAMELOOP_FASE		# nao tem tecla pressionada
    	lw t2,4(t1)		            # le o valor da tecla
 
 	# qual tecla
@@ -305,22 +309,22 @@ CONT_GRAVIDADE:
 	beq t2,t0,TROCA_MAPA
 
 	li t0,97	# a
-	beq t2,t0,ESQUERDA_FASE1
+	beq t2,t0,ESQUERDA_FASE
 	
 	li t0,100	# d
-	beq t2,t0,DIREITA_FASE1
+	beq t2,t0,DIREITA_FASE
 
 	li t0,119	# w
-	beq t2,t0,PULO_FASE1
+	beq t2,t0,PULO_FASE
 	
 	# nenhuma dessas letras
-	j CONT_GAMELOOP_FASE1
+	j CONT_GAMELOOP_FASE
 
 TROCA_MAPA:
 	not s0,s0
 	ret
 
-ESQUERDA_FASE1:
+ESQUERDA_FASE:
 	# verifica se é possível
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -349,15 +353,15 @@ ESQUERDA_FASE1:
 	lw t6,0(a2)
 
 	li t5,-1061109568	# azul
-	beq t4,t5,CONT_ESQUERDA_FASE1	# eh azul = nao desce
-	beq t6,t5,CONT_ESQUERDA_FASE1	# eh azul = nao desce
+	beq t4,t5,CONT_ESQUERDA_FASE	# eh azul = nao desce
+	beq t6,t5,CONT_ESQUERDA_FASE	# eh azul = nao desce
 
 	sw t1,0(t0)		# t1 = x
 
-CONT_ESQUERDA_FASE1:
+CONT_ESQUERDA_FASE:
 	ret
 
-DIREITA_FASE1:
+DIREITA_FASE:
 	# verifica se é possível
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -385,23 +389,23 @@ DIREITA_FASE1:
 	lw t6,0(a2)
 
 	li t5,-1061109568	# azul
-	beq t4,t5,CONT_DIREITA_FASE1	# eh azul = nao desce
-	beq t6,t5,CONT_DIREITA_FASE1	# eh azul = nao desce
+	beq t4,t5,CONT_DIREITA_FASE	# eh azul = nao desce
+	beq t6,t5,CONT_DIREITA_FASE	# eh azul = nao desce
 
 	sw t1,0(t0)		# t1 = x
 
-CONT_DIREITA_FASE1:
+CONT_DIREITA_FASE:
 	ret
 
-PULO_FASE1:
-	beqz s2,CONT_PULO_FASE1	# verifica se pode pular
+PULO_FASE:
+	beqz s2,CONT_PULO_FASE	# verifica se pode pular
 	li s1,ALTURA_PULO		# altura do pulo
 	addi s2,s2,-1			# diminui um pulo
-CONT_PULO_FASE1:
+CONT_PULO_FASE:
 	ret
 
-CONT_GAMELOOP_FASE1:
-	jal IMPRIME_FASE1
+CONT_GAMELOOP_FASE:
+	jal IMPRIME_FASE
 	
 	# imprime o player 1
 	li t4,0xFF000000 # endereco inicial da memoria de video
@@ -473,32 +477,32 @@ EXIT_LOOP:
 	li a0,10
 	ecall
 
-	j GAMELOOP_FASE1
+	j GAMELOOP_FASE
 
 # imprime a tela do mapa1
-IMPRIME_FASE1:
+IMPRIME_FASE:
     li t0,0xFF200604	# seleciona o frame 0
 	sw zero,0(t0)
 
 	li t1,0xFF000000	# endereco inicial da memoria VGA - Frame 0
 	li t2,0xFF012C00	# endereco final da memoria VGA - Frame 0
-	beqz s0,IMPRIME_FASE1_HITBOX
+	beqz s0,IMPRIME_FASE_HITBOX
 	la t0,mapa1_background	# endereco da imagem
-	j CONT_IMPRIME_FASE1_HITBOX
+	j CONT_IMPRIME_FASE_HITBOX
 
-IMPRIME_FASE1_HITBOX:
+IMPRIME_FASE_HITBOX:
 	la t0,mapa1_hitbox	# endereco da imagem
 
-CONT_IMPRIME_FASE1_HITBOX:
+CONT_IMPRIME_FASE_HITBOX:
 	addi t1,t1,8		# primeiro pixel depois das informacoes de nlin ncol
 
-LOOP_IMPRIME_FASE1: 	
-	beq t1,t2,CONT_IMPRIME_FASE1		# se for o ultimo endereco entao sai do loop
+LOOP_IMPRIME_FASE: 	
+	beq t1,t2,CONT_IMPRIME_FASE		# se for o ultimo endereco entao sai do loop
 	lw t3,0(t0)		# le um conjunto de 4 pixels (word)
 	sw t3,0(t1)		# escreve a word na memoria VGA
 	addi t1,t1,4	# soma 4 ao endereco da memoria
 	addi t0,t0,4	# soma 4 ao endereco da imagem
-	j LOOP_IMPRIME_FASE1
+	j LOOP_IMPRIME_FASE
 
-CONT_IMPRIME_FASE1:
+CONT_IMPRIME_FASE:
     ret
