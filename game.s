@@ -9,6 +9,9 @@
 COORD_P1:	.word	0,0	# (x, y) do jogador
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
+# coordenada inicial em de cada mapa (X, Y)
+COORD_INICIAL_MAPAS:	.word	0,0, 0,0, 0,0
+
 ### JOGO ###
 .text
 ### MENU INICIAL ###
