@@ -10,7 +10,7 @@ COORD_P1:	.word	0,0	# (x, y) do jogador
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 # coordenada inicial em de cada mapa (X, Y)
-COORD_INICIAL_MAPAS:	.word	32,70, 32,70, 0,0
+COORD_INICIAL_MAPAS:	.word	260,200, 32,70, 0,0
 
 ### JOGO ###
 .text
@@ -444,6 +444,45 @@ CONT_GAMELOOP_FASE:
 	beq t6,t5,RESET_VALUES	# eh vermelho = reseta
 
 	# não morreu
+
+### VENCEU ###
+	# verifica se ele passou de fase (pixel na altura é branco)
+
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	#addi t2,t2,-1	# olha o pixel abaixo dele (na altura nesse caso)
+
+	la t3,mapa1_hitbox
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+
+	add t3,t3,a1	# parte da esquerda do sprite
+
+	addi a1,a1,-16
+	add a2,a2,a1	# parte da direita do sprite
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1 # branco
+	bne t4,t5,NAO_PASSA_FASE	# nao eh branco = nao passa de fase
+	bne t6,t5,NAO_PASSA_FASE	# nao eh branco = nao passa de fase
+
+	# passa para a proxima fase
+	addi s4,s4,1	# proximo mapa
+	j RESET_VALUES	# reinicia os valores
+
+NAO_PASSA_FASE:
+	# não venceu
 
 	jal IMPRIME_FASE
 	
