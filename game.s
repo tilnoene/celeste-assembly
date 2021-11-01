@@ -564,7 +564,53 @@ EXIT_LOOP:
 	bne s4,t0,EXIT_LOOP1
 
 	# move o player 2
+	li a7,42	# randIntRange
+	li a0,1		# index of pseudorandom number generator
+	li a1,10	# [0, a1]
+	ecall
 
+	# 80% de chance de não mover
+	li t0,8
+	blt a0,t0,CONT_PLAYER2	# nao move
+
+	# move (verifica na mao ou testa a distancia manhattan incrementando pras 4 direcoes)
+
+	la t0,COORD_P1
+	lw t1,0(t0)	# t1 = x
+	lw t2,4(t0)	# t2 = y
+
+	la t0,COORD_P2
+	lw t3,0(t0)	# a3 = x
+	lw t4,4(t0)	# a4 = y
+
+	# x_inimigo < x_player
+	blt t3,t1,SOMA_X
+	# subtrai X
+	addi t3,t3,-4
+
+	j CONT_SOMA_X
+
+SOMA_X:
+	addi t3,t3,4
+
+CONT_SOMA_X:
+	# y_inimigo < y_player
+	blt t4,t2,SOMA_Y
+	# subtrai Y
+	addi t4,t4,-1
+
+	j CONT_SOMA_Y
+
+SOMA_Y:
+	addi t4,t4,1
+
+CONT_SOMA_Y:
+	# salva os valores das coordenadas do player 2
+	la t0,COORD_P2	# armazena as coordenadas
+	sw t3,0(t0)	# t3 = x
+	sw t4,4(t0)	# t4 = y
+
+CONT_PLAYER2:
 	# imprime o player 2
 	li t4,0xFF000000 # endereco inicial da memoria de video
 	la a5,inimigo_stop 	# carrega o sprite
