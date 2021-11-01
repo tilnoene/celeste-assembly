@@ -585,6 +585,7 @@ EXIT_LOOP:
 
 	# x_inimigo < x_player
 	blt t3,t1,SOMA_X
+	beq t3,t1,CONT_SOMA_X
 	# subtrai X
 	addi t3,t3,-4
 
@@ -596,6 +597,7 @@ SOMA_X:
 CONT_SOMA_X:
 	# y_inimigo < y_player
 	blt t4,t2,SOMA_Y
+	beq t4,t2,CONT_SOMA_Y
 	# subtrai Y
 	addi t4,t4,-1
 
@@ -609,6 +611,12 @@ CONT_SOMA_Y:
 	la t0,COORD_P2	# armazena as coordenadas
 	sw t3,0(t0)	# t3 = x
 	sw t4,4(t0)	# t4 = y
+
+	# ela matou a personagem?
+	bne t1,t3,CONT_PLAYER2
+	bne t2,t4,CONT_PLAYER2
+
+	j RESET_VALUES
 
 CONT_PLAYER2:
 	# imprime o player 2
