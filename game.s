@@ -1,6 +1,6 @@
 #.include "./MACROSv21.s"
 .eqv ALTURA_PULO 24
-.eqv FASE_INIMIGO 1	# numero da fase em que o inimigo aparece
+.eqv FASE_INIMIGO 2	# numero da fase em que o inimigo aparece
 
 .data
 .include "./sprites.s"
@@ -11,10 +11,10 @@ COORD_P1:	.word	0,0	# (x, y) do jogador
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 # coordenada inicial em de cada mapa (X, Y)
-COORD_INICIAL_MAPAS:	.word	260,200, 32,70, 0,0, 0,0, 0,0
+COORD_INICIAL_MAPAS:	.word	260,200, 36,46, 18,96, 0,0, 0,0
 
 # coordenada do item em cada mapa (X, Y)
-COORD_ITEM:	.word	32,70, 130,100, 0,0, 0,0, 0,0
+COORD_ITEM:	.word	32,70, 126,80, 30,170, 0,0, 0,0
 
 ### JOGO ###
 .text
@@ -65,9 +65,9 @@ LOOP_MAIN_MENU:
     li t1,0xFF200000	        # carrega o endereco de controle do KDMMIO
 	lw t0,0(t1)		            # le bit de Controle Teclado
    	andi t0,t0,0x0001	        # mascara o bit menos significativo
-   	beqz t0,LOOP_MAIN_MENU	# nao tem tecla pressionada entao volta ao loop
+   	beqz t0,LOOP_MAIN_MENU		# nao tem tecla pressionada entao volta ao loop
    	lw t2,4(t1)		            # le o valor da tecla
-    
+
 	j GAME  # qualquer tecla foi pressionada, entao inicie o jogo
 
 PLAY_NOTE_TRACK1: 	# toca a nota e avanca
@@ -187,7 +187,7 @@ CONT_IMPRIME_BACKGROUND_MAIN_MENU:
 GAME:
 	# carrega valores para a primeira fase
 	li s0,0		# alternar entre mapa / hitbox
-	li s4,0		# fase atual [0, 4]
+	li s4,2		# fase atual [0, 4]
 
 # reinicia os valores a cada fase
 RESET_VALUES:
@@ -195,6 +195,7 @@ RESET_VALUES:
 	li s2,0		# quantidade de pulos (max: 2)
 	li s5,1		# existe o item?
 	li s11,0	# frame atual
+	#la s10,mapa1_hitbox	# hitbox do mapa atual
 
 	# coordenadas inicias do player 1
 	la t0,COORD_INICIAL_MAPAS
@@ -210,8 +211,8 @@ RESET_VALUES:
 	sw t2,4(t0)	# t2 = y
 
 	# coordenadas iniciais do player 2
-	li t1,96	# x do player 2
-	li t2,180	# y do player 2
+	li t1,84	# x do player 2
+	li t2,160	# y do player 2
 
 	la t0,COORD_P2	# armazena as coordenadas
 	sw t1,0(t0)	# t1 = x
@@ -222,6 +223,38 @@ RESET_VALUES:
 	#li a0,100
 	#ecall
 
+	li t0,0
+	beq s4,t0,MAPA_1_GLOBAL_HITBOX
+	li t0,1
+	beq s4,t0,MAPA_2_GLOBAL_HITBOX
+	li t0,2
+	beq s4,t0,MAPA_3_GLOBAL_HITBOX
+	li t0,3
+	beq s4,t0,MAPA_4_GLOBAL_HITBOX
+	li t0,4
+	beq s4,t0,MAPA_5_GLOBAL_HITBOX
+
+MAPA_1_GLOBAL_HITBOX:
+	la s10,mapa1_hitbox	# endereco da imagem
+	j CONT_RESET_VALUES_HITBOX
+
+MAPA_2_GLOBAL_HITBOX:
+	la s10,mapa2_hitbox	# endereco da imagem
+	j CONT_RESET_VALUES_HITBOX
+
+MAPA_3_GLOBAL_HITBOX:
+	la s10,mapa3_hitbox	# endereco da imagem
+	j CONT_RESET_VALUES_HITBOX
+
+MAPA_4_GLOBAL_HITBOX:
+	la s10,mapa1_hitbox	# endereco da imagem
+	j CONT_RESET_VALUES_HITBOX
+
+MAPA_5_GLOBAL_HITBOX:
+	la s10,mapa1_hitbox	# endereco da imagem
+	j CONT_RESET_VALUES_HITBOX
+
+CONT_RESET_VALUES_HITBOX:
     jal IMPRIME_FASE		# imprime o mapa1
 
 ### FASE X ###
@@ -247,7 +280,7 @@ GAMELOOP_FASE:
 	lw t2,4(t0)		# t2 = y
 	addi t2,t2,16	# olha o pixel acima dele
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -288,7 +321,7 @@ GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	lw t2,4(t0)		# t2 = y
 	addi t2,t2,-1	# olha o pixel abaixo dele
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -350,8 +383,22 @@ CONT_GRAVIDADE:
 	li t0,119	# w
 	beq t2,t0,PULO_FASE
 	
+	li t0,98	# b (back = fase anterior)
+	beq t2,t0,BACK_FASE
+
+	li t0,110	# n (next = proxima fase)
+	beq t2,t0,NEXT_FASE
+
 	# nenhuma dessas letras
 	j CONT_GAMELOOP_FASE
+
+BACK_FASE:
+	addi s4,s4,-1
+	j RESET_VALUES
+
+NEXT_FASE:
+	addi s4,s4,1
+	j RESET_VALUES
 
 TROCA_MAPA:
 	not s0,s0
@@ -365,7 +412,7 @@ ESQUERDA_FASE:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,-4	# olha o pixel esquerda
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -402,7 +449,7 @@ DIREITA_FASE:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,4	# olha o pixel direita
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -447,7 +494,7 @@ CONT_GAMELOOP_FASE:
 	lw t2,4(t0)		# t2 = y
 	addi t2,t2,-1	# olha o pixel abaixo dele
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -481,7 +528,7 @@ CONT_GAMELOOP_FASE:
 	lw t2,4(t0)		# t2 = y
 	#addi t2,t2,-1	# olha o pixel abaixo dele (na altura nesse caso)
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -847,11 +894,11 @@ MAPA_1_BACKGROUND:
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_2_BACKGROUND:
-	la t0,mapa1_background	# endereco da imagem
+	la t0,mapa2_background	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_3_BACKGROUND:
-	la t0,mapa1_background	# endereco da imagem
+	la t0,mapa3_background	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_4_BACKGROUND:
@@ -879,11 +926,11 @@ MAPA_1_HITBOX:
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_2_HITBOX:
-	la t0,mapa1_hitbox	# endereco da imagem
+	la t0,mapa2_hitbox	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_3_HITBOX:
-	la t0,mapa1_hitbox	# endereco da imagem
+	la t0,mapa3_hitbox	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_4_HITBOX:
