@@ -187,7 +187,7 @@ CONT_IMPRIME_BACKGROUND_MAIN_MENU:
 GAME:
 	# carrega valores para a primeira fase
 	li s0,0		# alternar entre mapa / hitbox
-	li s4,2		# fase atual [0, 4]
+	li s4,0		# fase atual [0, 4]
 
 # reinicia os valores a cada fase
 RESET_VALUES:
@@ -314,7 +314,80 @@ GAMELOOP_FASE:
 NAO_SOBE:
 	li s1,0		# reseta estado do pulo
 
-GRAVIDADE:	# verifica se ele pode cair (gravidade)
+GRAVIDADE:	
+	# verifica se ele pode cair (gravidade)
+
+	# verifica se ele esta grudado numa parede
+	
+	# esquerda
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t1,t1,-4	# olha o pixel esquerda
+
+	mv t3,s10		# endereco da hitbox do mapa atual
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+	addi a1,a1,-16
+
+	add t3,t3,a1	# parte de baixo_esquerda
+
+	addi a1,a1,-5120	# y - 320 * 16
+	add a2,a2,a1	# parte de cima_esquerda
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061158912	# preto
+	beq t4,t5,RESETA_PULO	# eh preto = nao desce
+	beq t6,t5,RESETA_PULO	# eh preto = nao desce
+	li t5,-1061158912	# azul
+	beq t4,t5,RESETA_PULO	# eh azul = nao sobe
+	beq t6,t5,RESETA_PULO	# eh azul = nao sobe
+
+	# direita
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t1,t1,4	# olha o pixel direita
+
+	mv t3,s10		# endereco da hitbox do mapa atual
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+
+	add t3,t3,a1	# parte de baixo_direita
+
+	addi a1,a1,-5120	# y - 320 * 16
+	add a2,a2,a1	# parte de cima_direita
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,RESETA_PULO	# eh azul = nao desce
+	beq t6,t5,RESETA_PULO	# eh azul = nao desce
+	li t5,-1061158912	# preto
+	beq t4,t5,RESETA_PULO	# eh preto = nao desce
+	beq t6,t5,RESETA_PULO	# eh preto = nao desce
+
+	# verifica se o pixel abaixo nao eh azul
+
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
 	lw t1,0(t0)		# t1 = x
@@ -340,6 +413,7 @@ GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	lw t4,0(t3)
 	lw t6,0(a2)
 
+	# DEBUG
 	#mv a0,t4
 	#li a7,1
 	#ecall
@@ -351,13 +425,14 @@ GRAVIDADE:	# verifica se ele pode cair (gravidade)
 	li t5,-1061109568	# azul
 	beq t4,t5,RESETA_PULO	# eh azul = nao desce
 	beq t6,t5,RESETA_PULO	# eh azul = nao desce
-
+	
 	sw t2,4(t0)		# y--
 
 	j CONT_GRAVIDADE
 
 RESETA_PULO:
 	li s2,2		# reinicia os pulos (2 pulos)
+	j CONT_GRAVIDADE
 
 CONT_GRAVIDADE:
 	# verifica se uma tecla foi pressionada
@@ -435,6 +510,10 @@ ESQUERDA_FASE:
 	li t5,-1061109568	# azul
 	beq t4,t5,CONT_ESQUERDA_FASE	# eh azul = nao desce
 	beq t6,t5,CONT_ESQUERDA_FASE	# eh azul = nao desce
+	li t5,-1061158912	# preto
+	beq t4,t5,CONT_ESQUERDA_FASE	# eh preto = nao desce
+	beq t6,t5,CONT_ESQUERDA_FASE	# eh preto = nao desce
+
 
 	sw t1,0(t0)		# t1 = x
 
@@ -471,6 +550,9 @@ DIREITA_FASE:
 	li t5,-1061109568	# azul
 	beq t4,t5,CONT_DIREITA_FASE	# eh azul = nao desce
 	beq t6,t5,CONT_DIREITA_FASE	# eh azul = nao desce
+	li t5,-1061158912	# preto
+	beq t4,t5,CONT_DIREITA_FASE	# eh preto = nao desce
+	beq t6,t5,CONT_DIREITA_FASE	# eh preto = nao desce
 
 	sw t1,0(t0)		# t1 = x
 
@@ -795,7 +877,7 @@ CONT_SOMA_Y:
 	bgt t2,t3,CONT_PLAYER2
 
 	# ela matou
-	
+
 	j RESET_VALUES
 
 CONT_PLAYER2:
