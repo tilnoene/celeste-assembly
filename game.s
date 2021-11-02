@@ -299,6 +299,9 @@ RESET_VALUES:
 	beq s4,t0,MAPA_4_GLOBAL_HITBOX
 	li t0,4
 	beq s4,t0,MAPA_5_GLOBAL_HITBOX
+	
+	# acabaram as fases, fim de jogo
+	j CUTSCENE_FINAL
 
 MAPA_1_GLOBAL_HITBOX:
 	la s10,mapa1_hitbox	# endereco da imagem
@@ -1167,3 +1170,105 @@ LOOP_IMPRIME_FASE:
 
 CONT_IMPRIME_FASE:
     ret
+
+CUTSCENE_FINAL:
+
+FRAME1_FINAL:
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame1_final
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME1_FINAL: 	
+    beq t1,t2,FRAME2_FINAL		# se for o utimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME1_FINAL		# volta a verificar
+
+FRAME2_FINAL:
+	# SLEEP
+	li a7,32
+	li a0,3000
+	ecall
+
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame2_final
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME2_FINAL: 	
+    beq t1,t2,FRAME3_FINAL		# se for o utimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME2_FINAL		# volta a verificar
+
+FRAME3_FINAL:
+	# SLEEP
+	li a7,32
+	li a0,2000
+	ecall
+
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame3_final
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME3_FINAL: 	
+    beq t1,t2,FRAME4_FINAL		# se for o ultimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME3_FINAL		# volta a verificar
+
+FRAME4_FINAL:
+	# SLEEP
+	li a7,32
+	li a0,2000
+	ecall
+
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame1_creditos
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME4_FINAL: 	
+    beq t1,t2,FRAME5_FINAL		# se for o utimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME4_FINAL		# volta a verificar
+
+FRAME5_FINAL:
+	# SLEEP
+	li a7,32
+	li a0,2000
+	ecall
+
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame2_creditos
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME5_FINAL: 	
+    beq t1,t2,FRAME6_FINAL		# se for o utimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME5_FINAL		# volta a verificar
+
+FRAME6_FINAL:
+	# SLEEP
+	li a7,32
+	li a0,5000
+	ecall
+
+	# EXIT
+	li a7,10
+	ecall
