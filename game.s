@@ -197,6 +197,8 @@ RESET_VALUES:
 	li s11,0	# frame atual
 	#la s10,mapa1_hitbox	# hitbox do mapa atual
 	li s9,1		# sprite atual [0 - stop0, 1 - stop1, 2 - walk0, 3 - walk1, 4 - wall0, 5 - wall2]
+	# s8 = orientação do sprite
+	li s7,0		# orientação do inimigo
 
 	# coordenadas inicias do player 1
 	la t0,COORD_INICIAL_MAPAS
@@ -893,11 +895,13 @@ EXIT_LOOP:
 	beq t3,t1,CONT_SOMA_X
 	# subtrai X
 	addi t3,t3,-4
+	li s7,0	# orientacao = esquerda
 
 	j CONT_SOMA_X
 
 SOMA_X:
 	addi t3,t3,4
+	li s7,1	# orientacao = direita
 
 CONT_SOMA_X:
 	# y_inimigo < y_player
@@ -935,7 +939,10 @@ CONT_SOMA_Y:
 CONT_PLAYER2:
 	# imprime o player 2
 	li t4,0xFF000000 # endereco inicial da memoria de video
-	la a5,inimigo_stop 	# carrega o sprite
+	
+	la a5,inimigo_stop0 	# carrega o sprite
+	beqz s7,CONT_ESCOLHA_PLAYER2
+	la a5,inimigo_stop1 	# carrega o sprite
 
 CONT_ESCOLHA_PLAYER2:
 	lw a1,4(a5)	# a1 = h (altura do sprite)

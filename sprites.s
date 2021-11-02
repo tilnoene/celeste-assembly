@@ -10,4 +10,5 @@
 .include "sprites/madeline_wall1.data"
 
 ### INIMIGO ###
-.include "sprites/inimigo_stop.data"
+.include "sprites/inimigo_stop0.data"
+.include "sprites/inimigo_stop1.data"
