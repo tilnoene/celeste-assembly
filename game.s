@@ -196,6 +196,7 @@ RESET_VALUES:
 	li s5,1		# existe o item?
 	li s11,0	# frame atual
 	#la s10,mapa1_hitbox	# hitbox do mapa atual
+	li s9,1		# sprite atual [0 - stop0, 1 - stop1, 2 - walk0, 3 - walk1, 4 - wall0, 5 - wall2]
 
 	# coordenadas inicias do player 1
 	la t0,COORD_INICIAL_MAPAS
@@ -345,11 +346,12 @@ GRAVIDADE:
 
 	lw t4,0(t3)
 	lw t6,0(a2)
-
+	
+	li s8,4	# parede da esquerda
 	li t5,-1061158912	# preto
 	beq t4,t5,RESETA_PULO	# eh preto = nao desce
 	beq t6,t5,RESETA_PULO	# eh preto = nao desce
-	li t5,-1061158912	# azul
+	li t5,-1061109568	# azul
 	beq t4,t5,RESETA_PULO	# eh azul = nao sobe
 	beq t6,t5,RESETA_PULO	# eh azul = nao sobe
 
@@ -379,12 +381,15 @@ GRAVIDADE:
 	lw t4,0(t3)
 	lw t6,0(a2)
 
+	li s8,5		# parede da direita
 	li t5,-1061109568	# azul
 	beq t4,t5,RESETA_PULO	# eh azul = nao desce
 	beq t6,t5,RESETA_PULO	# eh azul = nao desce
 	li t5,-1061158912	# preto
 	beq t4,t5,RESETA_PULO	# eh preto = nao desce
 	beq t6,t5,RESETA_PULO	# eh preto = nao desce
+
+	li s8,0		# parado
 
 	# verifica se o pixel abaixo nao eh azul
 
@@ -435,6 +440,11 @@ RESETA_PULO:
 	j CONT_GRAVIDADE
 
 CONT_GRAVIDADE:
+	# s8 = sprite do anteiror
+	beqz s8,CONT_SEM_TROCAR_SPRITE
+	mv s9,s8
+
+CONT_SEM_TROCAR_SPRITE:
 	# verifica se uma tecla foi pressionada
     li t1,0xFF200000	        # carrega o endereco de controle do KDMMIO
 	lw t0,0(t1)		            # le bit de Controle Teclado
@@ -480,6 +490,8 @@ TROCA_MAPA:
 	ret
 
 ESQUERDA_FASE:
+	li s9,2	# walk0
+
 	# verifica se é possível
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -521,6 +533,8 @@ CONT_ESQUERDA_FASE:
 	ret
 
 DIREITA_FASE:
+	li s9,3	# walk1
+
 	# verifica se é possível
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -750,8 +764,46 @@ CONT_LOOP_I2:
 CONT_ITEM:
 	# imprime o player 1
 	li t4,0xFF000000 # endereco inicial da memoria de video
-	la a5,madeline_stop 	# carrega o sprite
 	
+	# s9 [0 - stop0, 1 - stop1, 2 - walk0, 3 - walk1, 4 - wall0, 5 - wall2]
+	li t0,0
+	beq s9,t0,SPRITE_STOP0
+	li t0,1
+	beq s9,t0,SPRITE_STOP1
+	li t0,2
+	beq s9,t0,SPRITE_WALK0
+	li t0,3
+	beq s9,t0,SPRITE_WALK1
+	li t0,4
+	beq s9,t0,SPRITE_WALL0
+	li t0,5
+	beq s9,t0,SPRITE_WALL1
+
+SPRITE_STOP0:
+	la a5,madeline_stop0 	# carrega o sprite
+	j CONT_SPRITE_PLAYER1
+
+SPRITE_STOP1:
+	la a5,madeline_stop1 	# carrega o sprite
+	j CONT_SPRITE_PLAYER1
+
+SPRITE_WALK0:
+	la a5,madeline_stop0 	# carrega o sprite
+	j CONT_SPRITE_PLAYER1
+
+SPRITE_WALK1:
+	la a5,madeline_stop1 	# carrega o sprite
+	j CONT_SPRITE_PLAYER1
+
+SPRITE_WALL0:
+	la a5,madeline_wall0 	# carrega o sprite
+	j CONT_SPRITE_PLAYER1
+
+SPRITE_WALL1:
+	la a5,madeline_wall1 	# carrega o sprite
+	j CONT_SPRITE_PLAYER1
+
+CONT_SPRITE_PLAYER1:
 	lw a1,4(a5)	# a1 = h (altura do sprite)
 	lw a2,0(a5)	# a2 = w (largura do sprite)
 	
