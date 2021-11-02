@@ -194,6 +194,7 @@ RESET_VALUES:
 	li s1,0		# "estado" do pulo (> 0 ele vai subindo até ser 0)
 	li s2,0		# quantidade de pulos (max: 2)
 	li s5,1		# existe o item?
+	li s11,0	# frame atual
 
 	# coordenadas inicias do player 1
 	la t0,COORD_INICIAL_MAPAS
@@ -217,14 +218,22 @@ RESET_VALUES:
 	sw t2,4(t0)	# t2 = y
 
 	# som de morte
-	li a7,33	# MidiOutSync
-	li a0,100
+	#li a7,33	# MidiOutSync
+	#li a0,100
 	#ecall
 
     jal IMPRIME_FASE		# imprime o mapa1
 
 ### FASE X ###
 GAMELOOP_FASE:
+	# Switch frame
+	li t0,0xFF200604	# escolhe o frame 0 ou 1
+	sw s11,0(t0)		# troca de frame
+
+	not s11,s11		# inverte o frame atual
+
+	jal IMPRIME_FASE
+
 	# verifica se ele está pulando (s1)
 	beqz s1 GRAVIDADE
 
@@ -610,8 +619,6 @@ CONT_LOOP_I2:
 	j LOOP_J2
 
 CONT_ITEM:
-	jal IMPRIME_FASE
-	
 	# imprime o player 1
 	li t4,0xFF000000 # endereco inicial da memoria de video
 	la a5,madeline_stop 	# carrega o sprite
@@ -739,7 +746,8 @@ CONT_PLAYER2:
 	# imprime o player 2
 	li t4,0xFF000000 # endereco inicial da memoria de video
 	la a5,inimigo_stop 	# carrega o sprite
-	
+
+CONT_ESCOLHA_PLAYER2:
 	lw a1,4(a5)	# a1 = h (altura do sprite)
 	lw a2,0(a5)	# a2 = w (largura do sprite)
 	
@@ -771,7 +779,7 @@ CONT_PLAYER2:
 	li t2,0 # j
 	
 	# escolhe o frame
-	beqz s11,LOOP_I1		# frame 0
+	beqz s11,LOOP_I1	# frame 0
 	li t0,0x00100000
 	add t4,t4,t0		# frame 1
 	
@@ -809,11 +817,16 @@ EXIT_LOOP1:
 
 # imprime a tela do mapa1
 IMPRIME_FASE:
-    li t0,0xFF200604	# seleciona o frame 0
-	sw zero,0(t0)
-
 	li t1,0xFF000000	# endereco inicial da memoria VGA - Frame 0
 	li t2,0xFF012C00	# endereco final da memoria VGA - Frame 0
+	
+	# escolhe o frame
+	beqz s11,CONT_ESCOLHA		# frame 0
+	li t0,0x00100000
+	add t1,t1,t0	# frame 1
+	add t2,t2,t0	# frame 1
+
+CONT_ESCOLHA:
 	beqz s0,IMPRIME_FASE_HITBOX
 	
 	li t0,0
