@@ -783,10 +783,19 @@ CONT_SOMA_Y:
 	sw t3,0(t0)	# t3 = x
 	sw t4,4(t0)	# t4 = y
 
-	# ela matou a personagem?
-	bne t1,t3,CONT_PLAYER2
-	bne t2,t4,CONT_PLAYER2
+	# ela matou a personagem? (-8 <= dist_manhattan <= 8)
+	sub t1,t1,t3
+	sub t2,t2,t4
 
+	li t3,-8
+	blt t1,t3,CONT_PLAYER2
+	blt t2,t3,CONT_PLAYER2
+	li t3,8
+	bgt t1,t3,CONT_PLAYER2
+	bgt t2,t3,CONT_PLAYER2
+
+	# ela matou
+	
 	j RESET_VALUES
 
 CONT_PLAYER2:
