@@ -216,6 +216,11 @@ RESET_VALUES:
 	sw t1,0(t0)	# t1 = x
 	sw t2,4(t0)	# t2 = y
 
+	# som de morte
+	li a7,33	# MidiOutSync
+	li a0,100
+	#ecall
+
     jal IMPRIME_FASE		# imprime o mapa1
 
 ### FASE X ###
@@ -529,6 +534,11 @@ NAO_PASSA_FASE:
 	addi s2,s2,1	# +1 pulo
 	li s5,0			# peguei o item
 
+	# som do item
+	li a7,33	# MidiOutSync
+	li a0,100
+	ecall
+
 	j CONT_ITEM
 
 IMPRIME_ITEM:
@@ -571,14 +581,14 @@ IMPRIME_ITEM:
 	li t2,0 # j
 	
 	# escolhe o frame
-	beqz s11,LOOP_I2		# frame 0
+	beqz s11,LOOP_I2	# frame 0
 	li t0,0x00100000
 	add t4,t4,t0		# frame 1
 	
 LOOP_I2:
 	beq t1,a1,CONT_ITEM
 	addi t1,t1,1 	# i++
-	li t2,0		# j = 0
+	li t2,0			# j = 0
 	
 	add t4,t4,t3
 	
@@ -706,12 +716,12 @@ CONT_SOMA_X:
 	blt t4,t2,SOMA_Y
 	beq t4,t2,CONT_SOMA_Y
 	# subtrai Y
-	addi t4,t4,-1
+	addi t4,t4,-2
 
 	j CONT_SOMA_Y
 
 SOMA_Y:
-	addi t4,t4,1
+	addi t4,t4,2
 
 CONT_SOMA_Y:
 	# salva os valores das coordenadas do player 2
