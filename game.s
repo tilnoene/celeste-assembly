@@ -609,6 +609,8 @@ DASH_DIREITA_LOOP:
 	blez s3,CONT_DASH_DIREITA_FASE
 	addi,s3,s3,-1
 
+	li s9,3	# walk1
+
 	# verifica se é possível
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -616,7 +618,7 @@ DASH_DIREITA_LOOP:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,4	# olha o pixel direita
 
-	la t3,mapa1_hitbox
+	mv t3,s10		# endereco da hitbox do mapa atual
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -638,6 +640,9 @@ DASH_DIREITA_LOOP:
 	li t5,-1061109568	# azul
 	beq t4,t5,CONT_DIREITA_FASE	# eh azul = nao desce
 	beq t6,t5,CONT_DIREITA_FASE	# eh azul = nao desce
+	li t5,-1061158912	# preto
+	beq t4,t5,CONT_DIREITA_FASE	# eh preto = nao desce
+	beq t6,t5,CONT_DIREITA_FASE	# eh preto = nao desce
 
 	sw t1,0(t0)		# t1 = x
 
@@ -646,7 +651,51 @@ CONT_DASH_DIREITA_FASE:
 	ret
 
 DASH_ESQUERDA_FASE:
+	li s3,4 #Contador do dash
+DASH_ESQUERDA_LOOP:
+	blez s3,CONT_DASH_ESQUERDA_FASE
+	addi,s3,s3,-1
 
+	li s9,2	# walk0
+
+	# verifica se é possível
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t1,t1,-4	# olha o pixel esquerda
+
+	mv t3,s10		# endereco da hitbox do mapa atual
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+	addi a1,a1,-16
+
+	add t3,t3,a1	# parte de baixo_esquerda
+
+	addi a1,a1,-5120	# y - 320 * 16
+	add a2,a2,a1	# parte de cima_esquerda
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,CONT_ESQUERDA_FASE	# eh azul = nao desce
+	beq t6,t5,CONT_ESQUERDA_FASE	# eh azul = nao desce
+	li t5,-1061158912	# preto
+	beq t4,t5,CONT_ESQUERDA_FASE	# eh preto = nao desce
+	beq t6,t5,CONT_ESQUERDA_FASE	# eh preto = nao desce
+
+
+	sw t1,0(t0)		# t1 = x
+
+	j DASH_ESQUERDA_LOOP
 CONT_DASH_ESQUERDA_FASE:
 	ret
 
