@@ -1,5 +1,5 @@
 #.include "./MACROSv21.s"
-.eqv ALTURA_PULO 20
+.eqv ALTURA_PULO 24
 .eqv FASE_INIMIGO 1	# numero da fase em que o inimigo aparece
 
 .data
@@ -11,7 +11,10 @@ COORD_P1:	.word	0,0	# (x, y) do jogador
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 # coordenada inicial em de cada mapa (X, Y)
-COORD_INICIAL_MAPAS:	.word	260,200, 32,70, 0,0
+COORD_INICIAL_MAPAS:	.word	260,200, 32,70, 0,0, 0,0, 0,0
+
+# coordenada do item em cada mapa (X, Y)
+COORD_ITEM:	.word	32,70, 130,100, 0,0, 0,0, 0,0
 
 ### JOGO ###
 .text
@@ -190,6 +193,7 @@ GAME:
 RESET_VALUES:
 	li s1,0		# "estado" do pulo (> 0 ele vai subindo até ser 0)
 	li s2,0		# quantidade de pulos (max: 2)
+	li s5,1		# existe o item?
 
 	# coordenadas inicias do player 1
 	la t0,COORD_INICIAL_MAPAS
@@ -491,8 +495,111 @@ CONT_GAMELOOP_FASE:
 	j RESET_VALUES	# reinicia os valores
 
 NAO_PASSA_FASE:
-	# não venceu
+	# nao venceu
 
+	# verifica se tem item
+	beqz s5,CONT_ITEM	# 0 = nao tem item
+
+	# verifica se consegue pegar o item
+
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw a1,0(t0)	# a3 = x
+	lw a2,4(t0)	# a4 = y
+
+	la t0,COORD_ITEM
+	li t1,8
+	mul t1,t1,s4	# mapa_atual * 2 (2 coord.) * 4 (1 word)
+	add t0,t0,t1
+
+	lw t1,0(t0)	# x do item 1
+	lw t2,4(t0)	# y do item 1
+
+	# -8 <= dist_manhattan <= 8
+	sub t4,a1,t1
+	sub t5,a2,t2
+
+	li t3,-8
+	blt t4,t3,IMPRIME_ITEM	# nao pega
+	blt t5,t3,IMPRIME_ITEM	# nao pega
+	li t3,8
+	bgt t4,t3,IMPRIME_ITEM	# nao pega
+	blt t5,t3,IMPRIME_ITEM	# nao pega
+
+	addi s2,s2,1	# +1 pulo
+	li s5,0			# peguei o item
+
+	j CONT_ITEM
+
+IMPRIME_ITEM:
+	# imprime o item
+	li t4,0xFF000000 # endereco inicial da memoria de video
+	la a5,inimigo_stop 	# carrega o sprite
+	
+	lw a1,4(a5)	# a1 = h (altura do sprite)
+	lw a2,0(a5)	# a2 = w (largura do sprite)
+	
+	# coordenadas atuais do item
+	la t0,COORD_ITEM
+	li t1,8
+	mul t1,t1,s4	# mapa_atual * 2 (2 coord.) * 4 (1 word)
+	add t0,t0,t1
+	
+	lw a3,0(t0)	# a3 = x
+	lw a4,4(t0)	# a4 = y
+
+	addi a5,a5,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	
+	li t0,240
+	sub t1,t0,a4	# inverte a orientacao em relacao ao eixo X
+	sub t0,t1,a1
+	
+	mv a4,t0	# t5 (ini) = x + 320 * (y - 1)
+	mv t5,a3	# t5 = x
+	li t1,320	
+	mul t6,t1,a4	# t6 = 320 * y
+	add t5,t5,t6	# t5 += t6
+	
+	add t4,t4,t5	# t4 += inicio
+	
+	li t3,320		# sum = 320 - w (quantidade para pular para a proxima linha)
+	sub t3,t3,a2	# -w
+	
+	sub t4,t4,t3	# memoria -= inicio (afinal pula a cada LOOP_I2, inclusive o primeiro)
+	
+	li t1,0 # i
+	li t2,0 # j
+	
+	# escolhe o frame
+	beqz s11,LOOP_I2		# frame 0
+	li t0,0x00100000
+	add t4,t4,t0		# frame 1
+	
+LOOP_I2:
+	beq t1,a1,CONT_ITEM
+	addi t1,t1,1 	# i++
+	li t2,0		# j = 0
+	
+	add t4,t4,t3
+	
+LOOP_J2:
+	beq t2,a2,LOOP_I2
+	addi t2,t2,1	# j++
+	
+	lb t0,0(a5)
+	
+	li a0,0xFFFFFFC7		# cor magenta
+	beq t0,a0,CONT_LOOP_I2	# se o pixel for magenta nao imprime nada
+
+PRINT_IMG2:	sb t0,0(t4)
+	
+CONT_LOOP_I2:
+	addi a5,a5,1	# sprite++
+	addi t4,t4,1	# memoria++
+	
+	j LOOP_J2
+
+CONT_ITEM:
 	jal IMPRIME_FASE
 	
 	# imprime o player 1
@@ -569,8 +676,8 @@ EXIT_LOOP:
 	li a1,10	# [0, a1]
 	ecall
 
-	# 80% de chance de não mover
-	li t0,8
+	# 90% de chance de não mover
+	li t0,9
 	blt a0,t0,CONT_PLAYER2	# nao move
 
 	# move (verifica na mao ou testa a distancia manhattan incrementando pras 4 direcoes)
