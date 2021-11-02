@@ -1,3 +1,5 @@
+.include "sprites/morango.data"
+
 ### MADELINE ###
 .include "sprites/madeline_stop.data"
 

@@ -534,7 +534,7 @@ NAO_PASSA_FASE:
 IMPRIME_ITEM:
 	# imprime o item
 	li t4,0xFF000000 # endereco inicial da memoria de video
-	la a5,inimigo_stop 	# carrega o sprite
+	la a5,morango 	# carrega o sprite
 	
 	lw a1,4(a5)	# a1 = h (altura do sprite)
 	lw a2,0(a5)	# a2 = w (largura do sprite)
