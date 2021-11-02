@@ -22,7 +22,7 @@ COORD_ITEM:	.word	218,140, 126,80, 30,170, 132,112, 210,126
 ### MENU INICIAL ###
 MAIN_MENU:
     # carrega valores para a primeira execucao
-	j GAME
+	#j GAME
 
     # reinicia os valores da musica
     li s8,0	    # contador de notas = 0
@@ -69,7 +69,7 @@ LOOP_MAIN_MENU:
    	beqz t0,LOOP_MAIN_MENU		# nao tem tecla pressionada entao volta ao loop
    	lw t2,4(t1)		            # le o valor da tecla
 
-	j GAME  # qualquer tecla foi pressionada, entao inicie o jogo
+	j CUTSCENE_INICIAL  # qualquer tecla foi pressionada, entao inicie o jogo
 
 PLAY_NOTE_TRACK1: 	# toca a nota e avanca
 	li a7,31	# MidiOut
@@ -183,6 +183,68 @@ LOOP_IMPRIME_BACKGROUND_MAIN_MENU:
 
 CONT_IMPRIME_BACKGROUND_MAIN_MENU:
     ret
+
+CUTSCENE_INICIAL:
+
+FRAME1_INICIO:
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame1_inicio
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME1_INICIO: 	
+    beq t1,t2,FRAME2_INICIO		# Se for o ?ltimo endereco entao sai do loop
+	lw t3,0(t4)		# le um conjunto de 4 pixels : word
+	sw t3,0(t1)		# escreve a word na memoria VGA
+	addi t1,t1,4		# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME1_INICIO			# volta a verificar
+
+FRAME2_INICIO:
+	# SLEEP
+	li a7,32
+	li a0,2000
+	ecall
+
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame2_inicio
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME2_INICIO: 	
+    beq t1,t2,FRAME3_INICIO		# Se for o ?ltimo endereco entao sai do loop
+	lw t3,0(t4)		# le um conjunto de 4 pixels : word
+	sw t3,0(t1)		# escreve a word na memoria VGA
+	addi t1,t1,4		# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME2_INICIO			# volta a verificar
+
+FRAME3_INICIO:
+	# SLEEP
+	li a7,32
+	li a0,3500
+	ecall
+
+	li t1,0xFF000000	# endereco inicial da Memoria VGA - frame 0
+	li t2,0xFF012C00	# endereco final
+	la t4,frame3_inicio
+	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
+
+LOOP_FRAME3_INICIO: 	
+    beq t1,t2,FRAME4_INICIO		# Se for o ?ltimo endereco entao sai do loop
+	lw t3,0(t4)		# le um conjunto de 4 pixels : word
+	sw t3,0(t1)		# escreve a word na memoria VGA
+	addi t1,t1,4		# soma 4 ao endereco
+	addi t4,t4,4
+	j LOOP_FRAME3_INICIO			# volta a verificar
+
+FRAME4_INICIO:
+	# SLEEP
+	li a7,32
+	li a0,2000
+	ecall
+
+	j GAME
 
 ### INICIA O JOGO ###
 GAME:
