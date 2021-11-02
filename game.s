@@ -193,12 +193,12 @@ FRAME1_INICIO:
 	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
 
 LOOP_FRAME1_INICIO: 	
-    beq t1,t2,FRAME2_INICIO		# Se for o ?ltimo endereco entao sai do loop
-	lw t3,0(t4)		# le um conjunto de 4 pixels : word
-	sw t3,0(t1)		# escreve a word na memoria VGA
-	addi t1,t1,4		# soma 4 ao endereco
+    beq t1,t2,FRAME2_INICIO		# se for o utimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
 	addi t4,t4,4
-	j LOOP_FRAME1_INICIO			# volta a verificar
+	j LOOP_FRAME1_INICIO		# volta a verificar
 
 FRAME2_INICIO:
 	# SLEEP
@@ -212,12 +212,12 @@ FRAME2_INICIO:
 	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
 
 LOOP_FRAME2_INICIO: 	
-    beq t1,t2,FRAME3_INICIO		# Se for o ?ltimo endereco entao sai do loop
-	lw t3,0(t4)		# le um conjunto de 4 pixels : word
-	sw t3,0(t1)		# escreve a word na memoria VGA
-	addi t1,t1,4		# soma 4 ao endereco
+    beq t1,t2,FRAME3_INICIO		# se for o utimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
 	addi t4,t4,4
-	j LOOP_FRAME2_INICIO			# volta a verificar
+	j LOOP_FRAME2_INICIO		# volta a verificar
 
 FRAME3_INICIO:
 	# SLEEP
@@ -231,12 +231,12 @@ FRAME3_INICIO:
 	addi t4,t4,8		# primeiro pixels depois das informa??es de nlin ncol
 
 LOOP_FRAME3_INICIO: 	
-    beq t1,t2,FRAME4_INICIO		# Se for o ?ltimo endereco entao sai do loop
-	lw t3,0(t4)		# le um conjunto de 4 pixels : word
-	sw t3,0(t1)		# escreve a word na memoria VGA
-	addi t1,t1,4		# soma 4 ao endereco
+    beq t1,t2,FRAME4_INICIO		# se for o ultimo endereco entao sai do loop
+	lw t3,0(t4)					# le um conjunto de 4 pixels : word
+	sw t3,0(t1)					# escreve a word na memoria VGA
+	addi t1,t1,4				# soma 4 ao endereco
 	addi t4,t4,4
-	j LOOP_FRAME3_INICIO			# volta a verificar
+	j LOOP_FRAME3_INICIO		# volta a verificar
 
 FRAME4_INICIO:
 	# SLEEP
