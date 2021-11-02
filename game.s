@@ -8,13 +8,14 @@
 .include "./musics.s"
 
 COORD_P1:	.word	0,0	# (x, y) do jogador
+
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 # coordenada inicial em de cada mapa (X, Y)
-COORD_INICIAL_MAPAS:	.word	260,200, 36,46, 18,96, 0,0, 0,0
+COORD_INICIAL_MAPAS:	.word	32,68, 36,46, 18,92, 36,72, 36,58
 
 # coordenada do item em cada mapa (X, Y)
-COORD_ITEM:	.word	32,70, 126,80, 30,170, 0,0, 0,0
+COORD_ITEM:	.word	218,140, 126,80, 30,170, 132,112, 210,126
 
 ### JOGO ###
 .text
@@ -250,11 +251,11 @@ MAPA_3_GLOBAL_HITBOX:
 	j CONT_RESET_VALUES_HITBOX
 
 MAPA_4_GLOBAL_HITBOX:
-	la s10,mapa1_hitbox	# endereco da imagem
+	la s10,mapa4_hitbox	# endereco da imagem
 	j CONT_RESET_VALUES_HITBOX
 
 MAPA_5_GLOBAL_HITBOX:
-	la s10,mapa1_hitbox	# endereco da imagem
+	la s10,mapa5_hitbox	# endereco da imagem
 	j CONT_RESET_VALUES_HITBOX
 
 CONT_RESET_VALUES_HITBOX:
@@ -1052,11 +1053,11 @@ MAPA_3_BACKGROUND:
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_4_BACKGROUND:
-	la t0,mapa1_background	# endereco da imagem
+	la t0,mapa4_background	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_5_BACKGROUND:
-	la t0,mapa1_background	# endereco da imagem
+	la t0,mapa5_background	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 IMPRIME_FASE_HITBOX:
@@ -1084,11 +1085,11 @@ MAPA_3_HITBOX:
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_4_HITBOX:
-	la t0,mapa1_hitbox	# endereco da imagem
+	la t0,mapa4_hitbox	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 MAPA_5_HITBOX:
-	la t0,mapa1_hitbox	# endereco da imagem
+	la t0,mapa5_hitbox	# endereco da imagem
 	j CONT_IMPRIME_FASE_HITBOX
 
 CONT_IMPRIME_FASE_HITBOX:

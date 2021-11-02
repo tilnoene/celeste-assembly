@@ -10,3 +10,9 @@
 
 .include "screens/mapa3_background.data"
 .include "screens/mapa3_hitbox.data"
+
+.include "screens/mapa4_background.data"
+.include "screens/mapa4_hitbox.data"
+
+.include "screens/mapa5_background.data"
+.include "screens/mapa5_hitbox.data"
