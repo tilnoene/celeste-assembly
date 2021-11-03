@@ -581,8 +581,11 @@ TROCA_MAPA:
 	ret
 
 PULO_DIAGONAL_ESQUERDA_FASE:
-	blez s2,CONT_PULO_DIAGONAL_ESQUERDA_FASE #sai da funcao se nao puder pular mais
+	blez s2,CONT_PULO_DIAGONAL_ESQUERDA_FASE # sai da funcao se nao puder pular mais
 	addi s2,s2,-1
+
+	li s9,2	# walk0
+
 	# verifica se é possível
 	# coordenadas atuais do jogador
 	la t0,COORD_P1
@@ -621,6 +624,8 @@ CONT_PULO_DIAGONAL_ESQUERDA_FASE:
 PULO_DIAGONAL_DIREITA_FASE:
 	blez s2,CONT_PULO_DIAGONAL_DIREITA_FASE
 	addi s2,s2,-1
+
+	li s9,3	# walk1
 
 	# verifica se é possível
 	# coordenadas atuais do jogador
