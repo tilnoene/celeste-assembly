@@ -6,6 +6,8 @@
 ### MADELINE ###
 .include "sprites/madeline_stop0.data"
 .include "sprites/madeline_stop1.data"
+.include "sprites/madeline_walk0.data"
+.include "sprites/madeline_walk1.data"
 .include "sprites/madeline_wall0.data"
 .include "sprites/madeline_wall1.data"
 

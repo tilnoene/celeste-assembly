@@ -8,7 +8,6 @@
 .include "./musics.s"
 
 COORD_P1:	.word	0,0	# (x, y) do jogador
-
 COORD_P2:	.word	0,0	# (x, y) do inimigo
 
 # coordenada inicial em de cada mapa (X, Y)
@@ -22,7 +21,7 @@ COORD_ITEM:	.word	218,140, 126,80, 30,170, 132,112, 210,126
 ### MENU INICIAL ###
 MAIN_MENU:
     # carrega valores para a primeira execucao
-	#j GAME
+	j GAME
 
     # reinicia os valores da musica
     li s8,0	    # contador de notas = 0
@@ -591,7 +590,7 @@ PULO_DIAGONAL_ESQUERDA_FASE:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,-2568	# olha o pixel esquerda  t1 = (8*320 + 8) = 2560
 
-	la t3,mapa1_hitbox
+	mv t3,s10
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -630,7 +629,7 @@ PULO_DIAGONAL_DIREITA_FASE:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,-2552	# olha o pixel direita  t1 = (8*320 - 8) = (2560 - 8)
 
-	la t3,mapa1_hitbox
+	mv t3,s10
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -810,7 +809,6 @@ ESQUERDA_FASE:
 	li t5,-1061158912	# preto
 	beq t4,t5,CONT_ESQUERDA_FASE	# eh preto = nao desce
 	beq t6,t5,CONT_ESQUERDA_FASE	# eh preto = nao desce
-
 
 	sw t1,0(t0)		# t1 = x
 
@@ -1073,11 +1071,11 @@ SPRITE_STOP1:
 	j CONT_SPRITE_PLAYER1
 
 SPRITE_WALK0:
-	la a5,madeline_stop0 	# carrega o sprite
+	la a5,madeline_walk0 	# carrega o sprite
 	j CONT_SPRITE_PLAYER1
 
 SPRITE_WALK1:
-	la a5,madeline_stop1 	# carrega o sprite
+	la a5,madeline_walk1 	# carrega o sprite
 	j CONT_SPRITE_PLAYER1
 
 SPRITE_WALL0:
@@ -1293,6 +1291,20 @@ EXIT_LOOP1:
 	li a0,10
 	ecall
 
+	# deixa ela com sprite parada
+
+	li t3,2
+	beq t3,s9,SPRITE_PARADO_0
+	li t3,3
+	bne t3,s9,CONT_SPRITE_PARADO
+
+	li s9,1
+	j CONT_SPRITE_PARADO
+
+SPRITE_PARADO_0:
+	li s9,0
+
+CONT_SPRITE_PARADO:
 	j GAMELOOP_FASE
 
 # imprime a tela do mapa1
