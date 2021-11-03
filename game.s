@@ -14,14 +14,14 @@ COORD_P2:	.word	0,0	# (x, y) do inimigo
 COORD_INICIAL_MAPAS:	.word	32,68, 36,46, 18,92, 36,72, 36,58
 
 # coordenada do item em cada mapa (X, Y)
-COORD_ITEM:	.word	218,140, 126,80, 30,170, 132,112, 210,126
+COORD_ITEM:	.word	220,118, 126,80, 30,110, 132,112, 210,100
 
 ### JOGO ###
 .text
 ### MENU INICIAL ###
 MAIN_MENU:
     # carrega valores para a primeira execucao
-	j GAME
+	#j GAME
 
     # reinicia os valores da musica
     li s8,0	    # contador de notas = 0
@@ -248,7 +248,7 @@ FRAME4_INICIO:
 ### INICIA O JOGO ###
 GAME:
 	# carrega valores para a primeira fase
-	li s0,0		# alternar entre mapa / hitbox
+	li s0,1		# alternar entre mapa [1] / hitbox [0]
 	li s4,0		# fase atual [0, 4]
 
 # reinicia os valores a cada fase
