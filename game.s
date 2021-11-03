@@ -14,7 +14,7 @@ COORD_P2:	.word	0,0	# (x, y) do inimigo
 COORD_INICIAL_MAPAS:	.word	32,68, 36,46, 18,92, 36,72, 36,58
 
 # coordenada do item em cada mapa (X, Y)
-COORD_ITEM:	.word	220,118, 126,80, 30,110, 132,112, 210,100
+COORD_ITEM:	.word	120,118, 126,80, 30,110, 132,112, 210,100
 
 ### JOGO ###
 .text
@@ -678,7 +678,7 @@ DASH_DIAGONAL_DIREITA_LOOP:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,-2552	# olha o pixel direita  t1 = (8*320 - 8) = (2560 - 8)
 
-	la t3,mapa1_hitbox
+  mv t3,s10
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
@@ -723,7 +723,7 @@ DASH_DIAGONAL_ESQUERDA_LOOP:
 	lw t2,4(t0)		# t2 = y
 	addi t1,t1,-2568	# olha o pixel esquerda  t1 = (8*320 + 8) = 2560
 
-	la t3,mapa1_hitbox
+  mv t3,s10
 	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
 	mv a2,t3		# copia endereco do mapa da hitbox
 
