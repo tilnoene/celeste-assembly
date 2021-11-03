@@ -21,7 +21,7 @@ COORD_ITEM:	.word	220,118, 126,80, 30,110, 132,112, 210,100
 ### MENU INICIAL ###
 MAIN_MENU:
     # carrega valores para a primeira execucao
-	#j GAME
+	# j GAME
 
     # reinicia os valores da musica
     li s8,0	    # contador de notas = 0
@@ -577,7 +577,8 @@ NEXT_FASE:
 	j RESET_VALUES
 
 TROCA_MAPA:
-	not s0,s0
+	#not s0,s0
+	xori s0,s0,0x0001
 	ret
 
 PULO_DIAGONAL_ESQUERDA_FASE:
@@ -663,7 +664,8 @@ CONT_PULO_DIAGONAL_DIREITA_FASE:
 	ret
 
 DASH_DIAGONAL_DIREITA_FASE:
-	li s3,4 # Contador de loops do dash
+	li s3,4 # contador de loops do dash
+	li s9,3	# sprite walk direita
 DASH_DIAGONAL_DIREITA_LOOP:
 	blez s3,CONT_DASH_DIREITA_FASE
 	addi,s3,s3,-1
@@ -709,12 +711,13 @@ CONT_DASH_DIAGONAL_DIREITA_FASE:
 	ret
 
 DASH_DIAGONAL_ESQUERDA_FASE:
-	li s3,4 # Contador de loops do dash
+	li s3,4 # contador de loops do dash
+	li s9,2	# sprite walk esquerda
 DASH_DIAGONAL_ESQUERDA_LOOP:
 	blez s3,CONT_DASH_DIREITA_FASE
 	addi,s3,s3,-1
 
-	blez s2,CONT_PULO_DIAGONAL_ESQUERDA_FASE #sai da funcao se nao puder pular mais
+	blez s2,CONT_PULO_DIAGONAL_ESQUERDA_FASE # sai da funcao se nao puder pular mais
 	addi s2,s2,-1
 	# verifica se é possível
 	# coordenadas atuais do jogador
@@ -852,11 +855,79 @@ CONT_DASH_ESQUERDA_FASE:
 	ret
 
 DASH_BAIXO_FASE:
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t2,t2,-1	# olha o pixel abaixo dele
+
+	mv t3,s10		# endereco da hitbox do mapa atual
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+
+	add t3,t3,a1	# parte da esquerda do sprite
+
+	addi a1,a1,-16
+	add a2,a2,a1	# parte da direita do sprite
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,CONT_DASH_BAIXO_FASE	# eh azul = nao vai
+	beq t6,t5,CONT_DASH_BAIXO_FASE	# eh azul = nao vai
+
+	# decrementa o y
+	la t0,COORD_P1
+	lw t2,4(t0)		# t2 = y
+	addi t2,t2,-16	# y -= -16
+	sw t2,4(t0)		# y = t2
 
 CONT_DASH_BAIXO_FASE:
 	ret
 
 DASH_CIMA_FASE:
+	# coordenadas atuais do jogador
+	la t0,COORD_P1
+	lw t1,0(t0)		# t1 = x
+	lw t2,4(t0)		# t2 = y
+	addi t2,t2,16	# olha o pixel acima dele
+
+	mv t3,s10		# endereco da hitbox do mapa atual
+	addi t3,t3,8 	# primeiro 8 pixels depois das informacoes de nlin ncol
+	mv a2,t3		# copia endereco do mapa da hitbox
+
+	li t5,240
+	sub a0,t5,t2	# y = 240 - y
+	
+	li t5,320
+	mul a1,a0,t5	# y * 320
+	add a1,a1,t1	# a1 += x
+
+	add t3,t3,a1	# parte da esquerda do sprite
+
+	addi a1,a1,-16
+	add a2,a2,a1	# parte da direita do sprite
+
+	lw t4,0(t3)
+	lw t6,0(a2)
+
+	li t5,-1061109568	# azul
+	beq t4,t5,CONT_DASH_BAIXO_FASE	# eh azul = nao vai
+	beq t6,t5,CONT_DASH_BAIXO_FASE	# eh azul = nao vai
+
+	# decrementa o y
+	la t0,COORD_P1
+	lw t2,4(t0)		# t2 = y
+	addi t2,t2,16	# y += 16
+	sw t2,4(t0)		# y = t2
 
 CONT_DASH_CIMA_FASE:
 	ret
